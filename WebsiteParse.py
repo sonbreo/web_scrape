@@ -1,4 +1,5 @@
 from os import get_terminal_size, linesep
+from typing import Deque
 from bs4 import BeautifulSoup
 import requests
 import csv
@@ -30,10 +31,17 @@ class WebsiteParse:
             count += 1
                         
             # self.sheet['Name'].append(line.get_text())
+        
+        """
+        TODO: 
+        - Input low/high parameters into the signature of the function.
+        - Is it possible to put in a two-dimensional array for the signature of the function.
+        """
         low = 100
         high = 500
         # self.price_range([low, high])
         self.price_range(low, high)
+        self.remove_duplicates()
 
         # TODO: Implement price velocity/volume
         # self.sheet['Date of Listing'] = []
@@ -56,37 +64,44 @@ class WebsiteParse:
         Filter out any items listed outside the price range specified.
 
         TODO:
-        - Loop through the dictionary
-        - Check if 'price' is within 'range'
-        - If yes, then do nothing
-        - If no, then pop item off the dictionary list for BOTH name and price
-        """
-        import pprint
-        pprint.pprint(self.sheet['Price'])
-        print('='*30)
+        - Remove duplicates.
+        - Sort by price.
+        """ 
+        while True:
+            for i in range(len(self.sheet['Price'])):
+                try:
+                    # If price value is outside of range then remove from dictionary.
+                    if low > int(self.sheet['Price'][i].replace('$', '')) or int(self.sheet['Price'][i].replace('$', '')) > high:
+                        self.sheet['Price'].pop(i)
+                        self.sheet['Name'].pop(i)
+                        break
+                except ValueError:
+                    # If price value is a non-integer than remove from dictionary.
+                    self.sheet['Price'].pop(i)
+                    self.sheet['Name'].pop(i)
+                    break
+            
+            # When price range filtering finishes, exit out of while loop.
+            if i == len(self.sheet['Price']):
+                break
         
+        return self.sheet
+
+    def remove_duplicates(self):
         """
-        TODO: The list gets updated everytime it finds a value that shouldn't belong to the list and we need to update the loop
-        or a better way to work around this.
+        Remove duplicate entries from dictionary.
+        Using a counting sort algorithm. Complexity is 0(n+k).
+            - n is the size of an array
+            - k is the amount of different possible elements
         """
-        # for i in len(self.sheet['Price']):
-            # try:
-                # if low > int(self.sheet['Price'][i])
+        # Intialise array
+        
 
-
-
-        # for line in self.sheet['Price']:
-        #     try:
-        #         if low > int(line.replace('$', '')) or int(line.replace('$', '')) > high:
-        #             temp.append(self.sheet['Price'].index(line))
-        #             # self.sheet['Price'].pop(self.sheet['Price'].index(line))  
-        #     except ValueError:
-        #         temp.append(self.sheet['Price'].index(line))
-        #         # self.sheet['Price'].pop(self.sheet['Price'].index(line))
-        # for i in temp:
-        #     self.sheet['Price'].pop(temp[i])
-        # pprint.pprint(self.sheet['Price'])
-
+        for i, j in enumerate(self.sheet['Name']):
+            print(i, j)
+                    
+            
+        
 
 
 
